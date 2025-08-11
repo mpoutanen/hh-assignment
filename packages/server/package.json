@@ -1,0 +1,32 @@
+{
+  "name": "server",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "nodemon",
+    "dev": "etsc",
+    "test": "node --loader tsx --test **/*test.ts"
+  },
+  "devDependencies": {
+    "@types/cors": "2.8.12",
+    "@types/dotenv": "8.2.0",
+    "@types/express": "4.17.14",
+    "@types/express-graphql": "0.9.0",
+    "@types/graphql": "14.5.0",
+    "@types/node": "18.11.9",
+    "@types/sqlite3": "3.1.8",
+    "dotenv": "16.0.3",
+    "esbuild": "0.15.4",
+    "esbuild-node-tsc": "2.0.4",
+    "nodemon": "2.0.20",
+    "tsx": "3.12.1",
+    "typescript": "4.9.3"
+  },
+  "dependencies": {
+    "change-case": "4.1.2",
+    "cors": "2.8.5",
+    "express": "4.18.2",
+    "express-graphql": "0.12.0",
+    "graphql": "16.6.0",
+    "sqlite3": "5.1.2"
+  }
+}
