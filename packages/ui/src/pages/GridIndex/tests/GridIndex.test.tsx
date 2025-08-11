@@ -1,14 +1,25 @@
-import React from 'react';
+import React from "react";
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from "vitest";
 
-import { render, screen } from '@testing-library/react';
-import { fromValue } from 'wonka';
-import { Provider } from 'urql';
-import { GridIndex } from '..';
+import { render, screen } from "@testing-library/react";
+import { fromValue } from "wonka";
+import { Provider } from "urql";
+import { GridIndex } from "..";
 
-describe('Home', () => {
-  it('renders grid index without data', () => {
+function getMockUsers(count: number, name: string = "Engineering") {
+  return Array.from({ length: count }, (_, i) => ({
+    id: i + 1,
+    department: {
+      id: 1,
+      name,
+    },
+    risk: name === "Engineering" ? 0 : i % 2 === 0 ? 0 : 1, // Alternate risk values
+  }));
+}
+
+describe("Home", () => {
+  it("renders grid index without data", () => {
     const responseState = {
       executeQuery: () =>
         fromValue({
@@ -19,30 +30,18 @@ describe('Home', () => {
     render(
       <Provider value={responseState}>
         <GridIndex />
-      </Provider>,
+      </Provider>
     );
 
-    expect(screen.getByText('Organization Risk Matrix')).toBeInTheDocument();
+    expect(screen.getByText("Organization Risk Matrix")).toBeInTheDocument();
   });
 
-  // TODO: This test fails. <GridIndex> seems "a little" constrained in terms
-  // of what inputs it works with. That's something to improve on!
-  it('renders grid index with data', () => {
+  it("renders grid index with data", () => {
     const responseState = {
       executeQuery: () =>
         fromValue({
           data: {
-            users: [
-              {
-                id: 1,
-                department: {
-                  id: 1,
-                  name: 'Engineering',
-                },
-                // Engineers are safe.
-                risk: 0,
-              },
-            ],
+            users: getMockUsers(25),
           },
         }),
     } as any;
@@ -50,9 +49,9 @@ describe('Home', () => {
     render(
       <Provider value={responseState}>
         <GridIndex />
-      </Provider>,
+      </Provider>
     );
 
-    expect(screen.getByText('Organization Risk Matrix')).toBeInTheDocument();
+    expect(screen.getByText("Organization Risk Matrix")).toBeInTheDocument();
   });
 });
