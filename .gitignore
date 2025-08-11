@@ -1,4 +1,4 @@
 node_modules
+packages/**/node_modules
+packages/**/dist
 .yarn
-packages/server/dist/*
-packages/ui/dist/*
