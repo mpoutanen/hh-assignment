@@ -57,4 +57,8 @@ export const createResolvers = (ctx: Context) => ({
       .getAll(ctx, { departmentId: args.departmentId })
       .then(addUserResolvers(ctx));
   },
+  departments: () =>
+    ctx.handlers.db.department
+      .getAll(ctx, {})
+      .then(addDepartmentResolvers(ctx)),
 });
