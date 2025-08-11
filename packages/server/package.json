@@ -4,7 +4,7 @@
   "scripts": {
     "start": "nodemon",
     "dev": "etsc",
-    "test": "node --loader tsx --test **/*test.ts"
+    "test": "vitest"
   },
   "devDependencies": {
     "@types/cors": "2.8.12",
@@ -19,7 +19,8 @@
     "esbuild-node-tsc": "2.0.4",
     "nodemon": "2.0.20",
     "tsx": "3.12.1",
-    "typescript": "4.9.3"
+    "typescript": "4.9.3",
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "change-case": "4.1.2",
