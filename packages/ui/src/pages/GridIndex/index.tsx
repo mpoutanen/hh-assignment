@@ -3,13 +3,19 @@ import { gql, useQuery } from 'urql';
 import styled from 'styled-components';
 
 import { TopBar } from '../../components/TopBar';
-import { Section } from '../../components/Section';
-import { Footer } from '../../components/Footer';
+
 import { Grid } from '../../components/Grid';
+import { Sidebar } from '../../components/Sidebar';
+import type { User } from '../../types/types';
+
+interface IHeroIndexProps {}
+
+// GraphQL queries to fetch users and department summaries
+// These queries should match the schema defined in the server code
 
 const userRiskQuery = gql`
-  query GetUsers {
-    users {
+  query GetUsers($departmentId: ID!) {
+    users(departmentId: $departmentId) {
       id
       department {
         id
@@ -20,7 +26,15 @@ const userRiskQuery = gql`
   }
 `;
 
-interface IHeroIndexProps {}
+const departmentSummaryQuery = gql`
+  query GetDepartmentSummary {
+    departments {
+      id
+      name
+      userCount
+    }
+  }
+`;
 
 const GridContainer = styled.div`
   display: flex;
@@ -33,46 +47,76 @@ const GridContainer = styled.div`
   }
 `;
 
-const handleLoading = () => <div>Loading...</div>;
-
 const handleNoData = () => <div>No data!</div>;
 
 const handleError = (message: string) => <div>Error! {message}</div>;
 
-type User = {
-  id: number;
-  department: { id: number; name: string };
-  risk: number;
-};
+/**
+ * Groups users by their department.
+ * Returns an object where the keys are department names and the values are arrays of users.
+ */
 
 export const GridIndex: React.FC<IHeroIndexProps> = () => {
-  const [result] = useQuery<{
+  const [activeDepartment, setActiveDepartment] = React.useState<number>(0);
+  // Queries to fetch users and department summaries
+  const [userResult] = useQuery<{
     users: User[];
   }>({
     query: userRiskQuery,
+    variables: {
+      departmentId: activeDepartment, // Fetch first department by default
+    },
   });
 
-  if (result.fetching) {
-    return handleLoading();
+  const [departmentResult] = useQuery<{
+    departments: { name: string; userCount: number; id: number }[];
+  }>({
+    query: departmentSummaryQuery,
+  });
+
+  // Combine the results from both queries for fetching and error handling
+  const queryResults = [userResult, departmentResult];
+
+  const isFetching = queryResults.some(result => result.fetching);
+  const firstError = queryResults.find(result => result.error)?.error;
+
+  if (firstError) {
+    return handleError(firstError.message);
   }
 
-  if (result.error) {
-    return handleError(result.error.message);
-  }
-
-  if (!result.data) {
+  if (!userResult.data) {
     return handleNoData();
   }
 
+  const departmentUsers = userResult.data?.users;
+
+  const departments =
+    departmentResult.data?.departments?.reduce(
+      (acc, { userCount, id, name }) => {
+        acc[name] = {
+          userCount,
+          id,
+        };
+        return acc;
+      },
+      {} as Record<string, { userCount: number; id: number }>,
+    ) ?? {};
+
+  const handleDepartmentClick = (departmentId: number) => {
+    setActiveDepartment(departmentId);
+  };
+
   return (
-    <main>
+    <>
       <TopBar />
-      <Section heading={'Organization Risk Matrix'} paragraph={``} />
-
-      {/** Improve this section. Data provided is defined on top in GraphQL query. You can decide what you use and what you dont't.*/}
-      <GridContainer>{<Grid users={result.data.users} />}</GridContainer>
-
-      <Footer />
-    </main>
+      <GridContainer>
+        <Sidebar
+          departments={departments}
+          activeDepartment={activeDepartment}
+          onDepartmentClick={handleDepartmentClick}
+        />
+        <Grid users={departmentUsers} loading={isFetching} />
+      </GridContainer>
+    </>
   );
 };
