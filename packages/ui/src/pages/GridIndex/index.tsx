@@ -1,12 +1,12 @@
-import * as React from 'react';
-import { gql, useQuery } from 'urql';
-import styled from 'styled-components';
+import * as React from "react";
+import { gql, useQuery } from "urql";
+import styled from "styled-components";
 
-import { TopBar } from '../../components/TopBar';
+import { TopBar } from "../../components/TopBar";
 
-import { Grid } from '../../components/Grid';
-import { Sidebar } from '../../components/Sidebar';
-import type { User } from '../../types/types';
+import { Grid } from "../../components/Grid";
+import { Sidebar } from "../../components/Sidebar";
+import type { User } from "../../types/types";
 
 interface IHeroIndexProps {}
 
@@ -77,8 +77,12 @@ export const GridIndex: React.FC<IHeroIndexProps> = () => {
   // Combine the results from both queries for fetching and error handling
   const queryResults = [userResult, departmentResult];
 
-  const isFetching = queryResults.some(result => result.fetching);
-  const firstError = queryResults.find(result => result.error)?.error;
+  const isFetching = queryResults.some((result) => result.fetching);
+  const firstError = queryResults.find((result) => result.error)?.error;
+
+  if (isFetching) {
+    return <div>Loading...</div>;
+  }
 
   if (firstError) {
     return handleError(firstError.message);
@@ -99,7 +103,7 @@ export const GridIndex: React.FC<IHeroIndexProps> = () => {
         };
         return acc;
       },
-      {} as Record<string, { userCount: number; id: number }>,
+      {} as Record<string, { userCount: number; id: number }>
     ) ?? {};
 
   const handleDepartmentClick = (departmentId: number) => {
@@ -115,7 +119,7 @@ export const GridIndex: React.FC<IHeroIndexProps> = () => {
           activeDepartment={activeDepartment}
           onDepartmentClick={handleDepartmentClick}
         />
-        <Grid users={departmentUsers} loading={isFetching} />
+        <Grid users={departmentUsers} />
       </GridContainer>
     </>
   );
