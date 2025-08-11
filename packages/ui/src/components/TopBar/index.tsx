@@ -1,6 +1,6 @@
-import * as React from 'react';
-
-import styled from 'styled-components';
+import * as React from "react";
+import { Section } from "../../components/Section";
+import styled from "styled-components";
 
 const Container = styled.header<Partial<ITopBar>>`
   background: #001147;
@@ -36,4 +36,10 @@ const Back = styled.img`
 
 interface ITopBar {}
 
-export const TopBar: React.FC<ITopBar> = () => <Container />;
+export const TopBar: React.FC<ITopBar> = () => {
+  return (
+    <Container>
+      <Section heading={"Organization Risk Matrix"} paragraph={``} />
+    </Container>
+  );
+};
