@@ -35,15 +35,26 @@ export const graphQLSchema = buildSchema(`
 const addUserResolvers = (ctx: Context) => (users: User[]) =>
   users.map((user) =>
     Object.assign(user, {
-      department: () =>
-        ctx.handlers.db.department.getById(ctx, {
-          id: user.departmentId,
-        }),
+      // Use DataLoader pattern to batch load departments
+      department: () => ctx.loaders.departmentLoader.load(user.departmentId),
     })
   );
+
+const addDepartmentResolvers =
+  (ctx: Context) => (departments: { id: number }[]) =>
+    departments.map((department) =>
+      Object.assign(department, {
+        userCount: () =>
+          ctx.handlers.db.department.countById(ctx, department.id),
+      })
+    );
 
 // Passing in ctx to all resolvers for dependency injection
 // All resolvers have access to all handlers and globals
 export const createResolvers = (ctx: Context) => ({
-  users: () => ctx.handlers.db.user.getAll(ctx, {}).then(addUserResolvers(ctx)),
+  users: (args: { departmentId: number }) => {
+    return ctx.handlers.db.user
+      .getAll(ctx, { departmentId: args.departmentId })
+      .then(addUserResolvers(ctx));
+  },
 });
