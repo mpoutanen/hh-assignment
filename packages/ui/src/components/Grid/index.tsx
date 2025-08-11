@@ -137,7 +137,7 @@ export const Grid: React.FC<IGridProps> = ({ users, loading }) => {
   }
 
   if (loading) {
-    return <div>{showLoading()}</div>;
+    return <Container>{showLoading()}</Container>;
   }
 
   return (
